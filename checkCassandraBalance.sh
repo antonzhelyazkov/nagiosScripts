@@ -2,4 +2,9 @@
 
 nodetoolBin="nodetool"
 
-hash $nodetoolBin 2>/dev/null || { echo >&2 "I require nodetool but it's not installed. Aborting."; exit 1; }
+hash $nodetoolBin 2>/dev/null
+checkNodetool=$?
+if [ $checkNodetool -ne 0 ]; then
+	echo "CRITICAL nodetool not found"
+	exit 2
+fi
