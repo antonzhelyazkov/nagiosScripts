@@ -13,16 +13,24 @@ nodetoolCommand=$($nodetoolBin status | grep UN)
 
 IFS='UN' read -r -a nodes <<< $nodetoolCommand
 
+counter=0
 for line in "${nodes[@]}"
 do
 	IFS=' ' read -r -a array <<< $line
-	nodeData=$(echo ${array[1]} | tr '\n' ' ')
-	nagiosLine=$nagiosLine$nodeData
-#	echo ${array[2]} | tr '\n' ' '
-#	for element in "${array[@]}"
-#	do
-#		echo $element
-#	done
+	nodeIP=$(echo ${array[0]} | sed -e 's/^[ \t]*//')
+	nodeData=$(echo ${array[1]} | sed -e 's/^[ \t]*//')
+
+	if [ ! -z $nodeIP ] || [ ! -z $nodeData ];then
+		if [ $counter -eq 0 ]; then
+                        nagiosLine="$nodeIP=$nodeData"
+			nagiosLinePNP="$nodeIP=$nodeData;"
+                else
+                        nagiosLine=$nagiosLine" $nodeIP=$nodeData"
+			nagiosLinePNP=$nagiosLinePNP" $nodeIP=$nodeData;"
+                fi
+	((counter++))
+	fi
 done
 
-echo $nagiosLine
+echo "$nagiosLine | $nagiosLinePNP"
+exit 0
