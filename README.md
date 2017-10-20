@@ -8,7 +8,7 @@ This plugin needs nvidia-smi and xmlstarlet
 ```
 OK GPU - 32%; Memory - 12%; Encoder - 53%; Decoder - 23% | gpu=32% memory=12% encoder=53[cuda]
 
-pnp4nagios template,
+#### pnp4nagios template installation
 check_nvidiasmi.php
 
 #### nvidia-smi installation
