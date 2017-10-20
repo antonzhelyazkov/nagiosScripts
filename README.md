@@ -10,7 +10,7 @@ OK GPU - 32%; Memory - 12%; Encoder - 53%; Decoder - 23% | gpu=32% memory=12% en
 pnp4nagios template,
 check_nvidiasmi.php
 
-### nvidia-smi installation
+#### nvidia-smi installation
 
 vi /etc/yum.repos.d/cuda.repo
 
