@@ -3,8 +3,9 @@
 
 ## check nvidia GPU utilization
 This plugin needs nvidia-smi and xmlstarlet
+```
 /usr/local/bin/check_nvidiasmi.sh
-
+```
 OK GPU - 32%; Memory - 12%; Encoder - 53%; Decoder - 23% | gpu=32% memory=12% encoder=53[cuda]
 
 pnp4nagios template,
