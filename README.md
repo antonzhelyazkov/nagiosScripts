@@ -11,9 +11,9 @@ OK GPU - 32%; Memory - 12%; Encoder - 53%; Decoder - 23% | gpu=32% memory=12% en
 #### pnp4nagios template installation
 place check_nvidiasmi.php in pnp4nagios template directory
 
-``
-/usr/share/nagios/html/pnp4nagios/templates/check_nvidiasmi.php  https://raw.githubusercontent.com/antonzhelyazkov/nagiosScripts/master/check_nvidiasmi.php
-``
+```
+curl -o /usr/share/nagios/html/pnp4nagios/templates/check_nvidiasmi.php  https://raw.githubusercontent.com/antonzhelyazkov/nagiosScripts/master/check_nvidiasmi.php
+```
 
 #### nvidia-smi installation
 
