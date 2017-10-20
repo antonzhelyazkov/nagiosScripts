@@ -12,13 +12,16 @@ check_nvidiasmi.php
 
 #### nvidia-smi installation
 
+```
 vi /etc/yum.repos.d/cuda.repo
+```
 
+```
 [cuda]
 name=cuda
 baseurl=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64
 enabled=1
 gpgcheck=1
 gpgkey=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/7fa2af80.pub
-
+```
 yum install cuda
