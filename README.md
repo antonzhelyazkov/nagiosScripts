@@ -30,3 +30,19 @@ gpgcheck=1
 gpgkey=http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/7fa2af80.pub
 ```
 yum install cuda
+
+#### NGINX cache hitrate
+
+Create cutom nginx log
+
+```
+log_format nginx_cache '$remote_addr – $upstream_cache_status [$time_local] '
+       '"$request" $status $body_bytes_sent '
+       '"$http_referer" "$http_user_agent" ';
+```
+
+log file must looks like
+
+```
+12.34.56.78 – MISS [11/Nov/2017:09:38:32 +0100] – "GET /qws/qwel/qwe.html HTTP/1.1" 200 1036448 "http://www.example.com/content" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0" "-" – "-" – "-" – "-" – "-"
+```
