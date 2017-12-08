@@ -28,10 +28,14 @@ done
 tmpDirTrimmed=$(echo $tmpXmlDir | sed 's:/*$::')
 tmpXml=$tmpDirTrimmed/$tmpXmlFileName
 
+temperatureWarningTreshold=85
+temperatureCriticalTreshold=95
+
 encoderWarning=0
 decoderWarning=0
 gpuWarning=0
 memoryWarning=0
+temperatureWarning=0
 
 hash xmlstarlet 2>/dev/null
 checkXmlstarlet=$?
@@ -58,11 +62,17 @@ encoderUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_
 gpuUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/utilization/gpu_util | sed 's/\ \%*$//')
 memoryUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/utilization/memory_util | sed 's/\ \%*$//')
 decoderUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/utilization/decoder_util | sed 's/\ \%*$//')
+temperature=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/temperature/gpu_temp | sed 's/\ \%*C//')
+temperatureMax=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/temperature/gpu_temp_max_threshold | sed 's/\ \%*C//')
+
+temperatureTresholdPercent=$(awk "BEGIN { pc=100*${temperature}/${temperatureMax}; i=int(pc); print (pc-i<0.5)?i:i+1 }")
 
 rm -f $tmpXml
 
-if [ $encoderUtil -lt $warning ] && [ $gpuUtil -lt $warning ] && [ $memoryUtil -lt $warning ] && [ $decoderUtil -lt $warning ]; then
-        echo "OK GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil% | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil%"
+#echo $temperatureTresholdPercent $temperatureWarningTreshold
+
+if [ $encoderUtil -lt $warning ] && [ $gpuUtil -lt $warning ] && [ $memoryUtil -lt $warning ] && [ $decoderUtil -lt $warning ] && [ $temperatureTresholdPercent -lt $temperatureWarningTreshold ]; then
+        echo "OK GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature"
         exit 0
 fi
 
@@ -82,12 +92,18 @@ if [ $memoryUtil -gt $warning ] && [ $memoryUtil -lt $critical ]; then
         memoryWarning=1
 fi
 
-if [ $encoderWarning -eq 1 ] || [ $decoderWarning -eq 1 ] || [ $gpuWarning -eq 1 ] || [ $memoryWarning -eq 1 ]; then
-        echo "WARNING GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil% | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil%"
+if [ $temperatureTresholdPercent -gt $temperatureWarningTreshold ] && [ $temperatureTresholdPercent -lt $temperatureCriticalTreshold ]; then
+        temperatureWarning=1
+fi
+
+#echo "enc" $encoderWarning "dec" $decoderWarning "gpu" $gpuWarning "mem" $memoryWarning "temp" $temperatureWarning
+
+if [ $encoderWarning -eq 1 ] || [ $decoderWarning -eq 1 ] || [ $gpuWarning -eq 1 ] || [ $memoryWarning -eq 1 ] || [ $temperatureWarning -eq 1 ]; then
+        echo "WARNING GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature"
         exit 1
 fi
 
-if [ $encoderUtil -gt $critical ] || [ $gpuUtil -gt $critical ] || [ $memoryUtil -gt $critical ] || [ $decoderUtil -gt $critical ]; then
-        echo "CRITICAL GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil% | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil%"
+if [ $encoderUtil -gt $critical ] || [ $gpuUtil -gt $critical ] || [ $memoryUtil -gt $critical ] || [ $decoderUtil -gt $critical ] || [ $temperatureTresholdPercent -gt $temperatureCriticalTreshold ]; then
+        echo "CRITICAL GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature"
         exit 2
 fi
