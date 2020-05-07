@@ -3,8 +3,6 @@
 logFile="/var/log/clearSwap.log"
 pidFile="/var/run/clearSwap.pid"
 
-echo $0
-
 if [[ $EUID -ne 0 ]]; then
         echo "This script must be run as root"
         echo $(date "+%Y-%m-%d %H:%M:%S") "This script must be run as root" >> $logFile
