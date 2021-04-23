@@ -10,6 +10,7 @@ CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 def get_services(in_json: dict) -> list:
     services = []
     for key in in_json:
+        print(key['type'])
         if key['type'] == 'service':
             services.append(key)
 
@@ -26,7 +27,7 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    services =  get_services(config)
+    services = get_services(config)
     print(services)
 
 
