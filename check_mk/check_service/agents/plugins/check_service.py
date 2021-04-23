@@ -7,9 +7,13 @@ config_file_name = os.path.basename(sys.argv[0]).split('.')[0]
 CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
-def get_services(in_json: dict):
+def get_services(in_json: dict) -> list:
+    services = []
     for key in in_json:
-        print(key)
+        if key['type'] == 'service':
+            services.append(key)
+
+    return services
 
 
 def main():
@@ -22,10 +26,8 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    try:
-        get_services(config)
-    except OSError as e:
-        print(e)
+    services =  get_services(config)
+    print(services)
 
 
 if __name__ == "__main__":
