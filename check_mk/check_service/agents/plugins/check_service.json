@@ -1,0 +1,3 @@
+{
+  "firewalld": {"return":  1}
+}

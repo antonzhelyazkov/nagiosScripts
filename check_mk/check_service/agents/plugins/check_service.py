@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -9,7 +10,8 @@ def main():
     with open(CONFIG_FILE, 'r') as config_handler:
         config_raw = config_handler.read()
 
-    print(config_raw)
+    config = json.loads(config_raw)
+    print(config)
 
 
 if __name__ == "__main__":
