@@ -1,3 +1,6 @@
 {
-  "firewalld": {"return":  1}
+  "firewalld": {
+    "return":  1,
+    "type": "service"
+  }
 }
