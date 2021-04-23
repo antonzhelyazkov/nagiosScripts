@@ -27,8 +27,7 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    services = get_services(config)
-    print(services)
+    get_services(config)
 
 
 if __name__ == "__main__":
