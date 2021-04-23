@@ -1,7 +1,8 @@
 import os
 import sys
 
-CONFIG_FILE = f"/etc/check_mk/{os.path.basename(sys.argv[0])}"
+config_file_name = os.path.basename(sys.argv[0]).split('.')[0]
+CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
 def main():
