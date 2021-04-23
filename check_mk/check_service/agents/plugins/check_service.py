@@ -8,7 +8,8 @@ CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
 def get_services(in_json: dict):
-    print(in_json.values())
+    for key in in_json:
+        print(key)
 
 
 def main():
