@@ -12,7 +12,6 @@ def get_services(in_json: dict):
 
 
 def main():
-    config = None
     with open(CONFIG_FILE, 'r') as config_handler:
         config_raw = config_handler.read()
 
@@ -20,6 +19,7 @@ def main():
         config = json.loads(config_raw)
     except json.decoder.JSONDecodeError as conf_err:
         print(f"ERROR config {conf_err}")
+        return False
 
     print(config)
 
