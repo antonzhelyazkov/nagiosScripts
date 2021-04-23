@@ -2,5 +2,13 @@
   "firewalld": {
     "return":  1,
     "type": "service"
+  },
+  "iptables": {
+    "return":  1,
+    "type": "service"
+  },
+  "ffmpeg": {
+    "return":  1,
+    "type": "process"
   }
 }
