@@ -29,8 +29,7 @@ def main():
     service = filter(lambda seq: config[seq]['type'] == 'service', config.keys())
 
     for item_service in list(service):
-        if check_service(item_service):
-            print(f"{config[item_service]['type']} {item_service}")
+        print(f"{config[item_service]['type']} {item_service} {check_service(item_service)}")
 
 
 if __name__ == "__main__":
