@@ -7,8 +7,13 @@ config_file_name = os.path.basename(sys.argv[0]).split('.')[0]
 CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
-def check_service(service_name):
-    return True
+def check_service(service_name) -> bool:
+    cmd = ["systenctl", "is-active", "--quiet", service_name]
+    stat = subprocess.call(cmd)
+    if stat == 0:
+        return True
+    else:
+        return False
 
 
 def main():
