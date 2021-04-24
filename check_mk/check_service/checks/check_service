@@ -1,0 +1,32 @@
+from .agent_based_api.v1 import *
+import pprint
+
+
+def discover_foobar(section):
+    for sector, used, slots in section:
+        yield Service(item=sector)
+
+
+def check_foobar(item, section):
+    for sector, used, slots in section:
+        if sector == item:
+            used = int(used)    # convert string to int
+            slots = int(slots)  # convert string to int
+            if used == slots:
+                s = State.CRIT
+            elif slots - used <= 10:
+                s = State.WARN
+            else:
+                s = State.OK
+            yield Result(
+                state = s,
+                summary = f"used {used} out of {slots} slots")
+            return
+
+
+register.check_plugin(
+    name = "foobar",
+    service_name = "Foobar Sector %s",
+    discovery_function = discover_foobar,
+    check_function = check_foobar,
+)
