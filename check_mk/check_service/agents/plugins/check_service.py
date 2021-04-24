@@ -32,7 +32,7 @@ def main():
         return False
 
     service = filter(is_service, config.keys())
-    print(service)
+    print(list(service))
 
 
 if __name__ == "__main__":
