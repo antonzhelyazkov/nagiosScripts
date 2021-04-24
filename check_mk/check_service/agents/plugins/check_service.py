@@ -25,7 +25,8 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    service = filter(lambda seq: is_service(config[seq]), config.keys())
+    # service = filter(lambda seq: is_service(config[seq]), config.keys())
+    service = filter(lambda seq: config[seq]['type'] == 'service', config.keys())
     print(list(service))
 
 
