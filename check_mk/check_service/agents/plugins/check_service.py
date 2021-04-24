@@ -8,7 +8,7 @@ CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
 def check_service(service_name) -> bool:
-    cmd = ["systenctl", "is-active", "--quiet", service_name]
+    cmd = ["systemctl", "is-active", "--quiet", service_name]
     stat = subprocess.call(cmd)
     if stat == 0:
         return True
