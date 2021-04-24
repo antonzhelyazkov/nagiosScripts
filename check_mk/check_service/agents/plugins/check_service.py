@@ -25,7 +25,7 @@ def main():
         return False
 
     service = filter(lambda seq: seq['value'] == 'service', config.keys())
-    print(service)
+    print(list(service))
 
 
 if __name__ == "__main__":
