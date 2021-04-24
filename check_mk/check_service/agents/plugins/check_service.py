@@ -16,10 +16,11 @@ def get_services(in_json: dict) -> list:
     return services
 
 
-def is_service(x, values):
-    print(x)
-    print(values)
-    return True
+def is_service(values) -> bool:
+    if values['type'] == 'service':
+        return True
+    else:
+        return False
 
 
 def main():
@@ -32,7 +33,7 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    service = filter(lambda seq: is_service(seq, config[seq]), config.keys())
+    service = filter(lambda seq: is_service(config[seq]), config.keys())
     print(list(service))
 
 
