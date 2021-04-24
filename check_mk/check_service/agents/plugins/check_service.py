@@ -8,6 +8,7 @@ CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
 def main():
+    print(f'<<<{config_file_name}>>>')
     try:
         config_handler = open(CONFIG_FILE, 'r')
         config_raw = config_handler.read()
