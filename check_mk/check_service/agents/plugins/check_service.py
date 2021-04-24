@@ -32,7 +32,7 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    service = filter(lambda seq: is_service(seq, config), config.keys())
+    service = filter(lambda seq: is_service(seq, config[seq]), config.keys())
     print(list(service))
 
 
