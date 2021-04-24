@@ -16,8 +16,9 @@ def get_services(in_json: dict) -> list:
     return services
 
 
-def is_service(x):
+def is_service(x, values):
     print(x)
+    print(values)
     return True
 
 
@@ -31,8 +32,8 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    service = filter(is_service, config.keys())
-    # print(list(service))
+    service = filter(lambda seq: is_service(seq, config), config.keys())
+    print(list(service))
 
 
 if __name__ == "__main__":
