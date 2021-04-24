@@ -7,14 +7,6 @@ config_file_name = os.path.basename(sys.argv[0]).split('.')[0]
 CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
-def is_service(values) -> bool:
-    print(values['type'])
-    if values['type'] == 'service':
-        return True
-    else:
-        return False
-
-
 def main():
     with open(CONFIG_FILE, 'r') as config_handler:
         config_raw = config_handler.read()
@@ -25,7 +17,6 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    # service = filter(lambda seq: is_service(config[seq]), config.keys())
     service = filter(lambda seq: config[seq]['type'] == 'service', config.keys())
     print(list(service))
 
