@@ -7,6 +7,10 @@ config_file_name = os.path.basename(sys.argv[0]).split('.')[0]
 CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
+def check_service(service_name):
+    return True
+
+
 def main():
     print(f'<<<{config_file_name}>>>')
     try:
@@ -23,7 +27,10 @@ def main():
         return False
 
     service = filter(lambda seq: config[seq]['type'] == 'service', config.keys())
-    print(list(service))
+
+    for item_service in list(service):
+        if check_service(item_service):
+            print(f"{config[item_service]['type']} {item_service}")
 
 
 if __name__ == "__main__":
