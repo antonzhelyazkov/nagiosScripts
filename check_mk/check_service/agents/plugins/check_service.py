@@ -4,7 +4,7 @@ import sys
 import subprocess
 
 config_file_name = os.path.basename(sys.argv[0]).split('.')[0]
-CONFIG_FILE = f"/etc/check_mk/{config_file_name}.2"
+CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
 def main():
