@@ -16,6 +16,11 @@ def get_services(in_json: dict) -> list:
     return services
 
 
+def is_service(x):
+    print(x)
+    return True
+
+
 def main():
     with open(CONFIG_FILE, 'r') as config_handler:
         config_raw = config_handler.read()
@@ -26,7 +31,7 @@ def main():
         print(f"ERROR config {conf_err}")
         return False
 
-    service = get_services(config)
+    service = filter(is_service, config.keys())
     print(service)
 
 
