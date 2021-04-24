@@ -8,8 +8,12 @@ CONFIG_FILE = f"/etc/check_mk/{config_file_name}.2"
 
 
 def main():
-    with open(CONFIG_FILE, 'r') as config_handler:
+    try:
+        config_handler = open(CONFIG_FILE, 'r')
         config_raw = config_handler.read()
+    except OSError as err:
+        print(f"ERROR miss {err}")
+        return False
 
     try:
         config = json.loads(config_raw)
