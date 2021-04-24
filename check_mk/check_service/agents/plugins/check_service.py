@@ -8,6 +8,7 @@ CONFIG_FILE = f"/etc/check_mk/{config_file_name}"
 
 
 def is_service(values) -> bool:
+    print(values['type'])
     if values['type'] == 'service':
         return True
     else:
