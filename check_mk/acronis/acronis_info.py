@@ -27,7 +27,7 @@ from .utils.device_types import is_fibrechannel_switch, SNMPDeviceType
 
 class SNMPInfo(NamedTuple):
     description: str
-    expire: str
+    status: str
 
 
 def _parse_string(val):
@@ -52,12 +52,12 @@ def host_label_snmp_info(section: SNMPInfo) -> HostLabelGenerator:
 
 
 register.snmp_section(
-    name="acronis_expire",
+    name="acronis_info",
     parse_function=parse_snmp_info,
     host_label_function=host_label_snmp_info,
     fetch=SNMPTree(
         base=".1.3.6.1.4.1.8072.161.1.1",
-        oids=["1.0", "9.0"],
+        oids=["1.0", "2.0"],
     ),
     detect=exists(".1.3.6.1.2.1.1.1.0"),
 )
@@ -67,26 +67,10 @@ def discover_snmp_info(section: SNMPInfo) -> DiscoveryResult:
     yield Service()
 
 
-def check_expire(date: str) -> bool:
-    import time
-    import datetime
-
-    days_expire = 10
-    seconds_expire = days_expire * 86400
-
-    current_timestamp = int(time.time())
-    expiry_timestamp = int(time.mktime(datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S").timetuple()))
-
-    if (expiry_timestamp - current_timestamp) > seconds_expire:
-        return True
-    else:
-        return False
-
-
 def check_snmp_info(section: SNMPInfo) -> CheckResult:
-    summary_string = f"{section.expire}"
-    details_string = f"{section.description}, {section.expire}"
-    if check_expire(section.expire):
+    summary_string=f"{section.status}"
+    details_string=f"{section.description}, {section.status}"
+    if section.status == "healthy":
         yield Result(
             state=State.OK,
             summary=summary_string,
@@ -101,8 +85,8 @@ def check_snmp_info(section: SNMPInfo) -> CheckResult:
 
 
 register.check_plugin(
-    name="acronis_expire",
-    service_name="Acronis Expire",
+    name="acronis_info",
+    service_name="Acronis Info",
     discovery_function=discover_snmp_info,
     check_function=check_snmp_info,
 )
@@ -116,12 +100,11 @@ def inventory_snmp_info(section: SNMPInfo) -> InventoryResult:
 
     yield Attributes(path=["software", "configuration", "snmp_info"],
                      inventory_attributes={
-                         "description": section.description,
-                         "expire": section.expire,
+                         "status": section.status,
                      })
 
 
 register.inventory_plugin(
-    name="acronis_expire",
+    name="acronis_info",
     inventory_function=inventory_snmp_info,
 )
