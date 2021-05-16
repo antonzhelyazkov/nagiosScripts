@@ -1,32 +1,31 @@
 from .agent_based_api.v1 import *
 import pprint
 
-
-def discover_foobar(section):
-    for sector, used, slots in section:
-        yield Service(item=sector)
+with open('/tmp/service', 'w') as test_open:
+    test_open.write("qweqweqwe")
 
 
-def check_foobar(item, section):
-    for sector, used, slots in section:
-        if sector == item:
-            used = int(used)    # convert string to int
-            slots = int(slots)  # convert string to int
-            if used == slots:
-                s = State.CRIT
-            elif slots - used <= 10:
-                s = State.WARN
-            else:
+def discover_service(section):
+    for service, name, status in section:
+        yield Service(item=service)
+
+
+def check_service(item, section):
+    for service, name, status in section:
+        if service == item:
+            if status:
                 s = State.OK
+            else:
+                s = State.WARNING
             yield Result(
-                state = s,
-                summary = f"used {used} out of {slots} slots")
+                state=s,
+                summary=f"service {service} is {status}")
             return
 
 
 register.check_plugin(
-    name = "foobar",
-    service_name = "Foobar Sector %s",
-    discovery_function = discover_foobar,
-    check_function = check_foobar,
+    name="check_service",
+    service_name="service %s",
+    discovery_function=discover_service,
+    check_function=check_service,
 )
