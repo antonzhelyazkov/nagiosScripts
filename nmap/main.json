@@ -1,3 +1,3 @@
 {
-  "pid_file_path": 1
+  "pid_file_path": "/usr/local/nagiosScripts/nmap"
 }
