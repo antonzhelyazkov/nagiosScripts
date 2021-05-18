@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import time
 
 
 class PidFileExists(Exception):
@@ -71,6 +72,13 @@ def main():
         sys.exit(1)
     except OSError as e:
         logger.exception(f"#### {e}")
+
+    try:
+        with open(nagios_file, "w") as nagios:
+            nagios.write(str(int(time.time())))
+            os.remove(pid_file)
+    except IOError as e:
+        logger.exception(f"##### {e}")
 
 
 if __name__ == "__main__":
