@@ -9,17 +9,59 @@ nvidiaSMI = xml.dom.minidom.parseString(Popen(["nvidia-smi", "-q", "-x"], stdout
 
 for gpu in nvidiaSMI.getElementsByTagName('gpu'):
     id_gpu = gpu.getAttribute('id')
-    gpu_utilization = int(gpu
-                          .getElementsByTagName("utilization")[0]
-                          .getElementsByTagName("gpu_util")[0]
-                          .childNodes[0]
-                          .data.split()[0])
 
-    gpu_mem_usage = int(gpu
-                        .getElementsByTagName("utilization")[0]
-                        .getElementsByTagName("memory_util")[0]
-                        .childNodes[0]
-                        .data.split()[0])
+    # Make sure assumptions about units match reality
+    unit = (gpu
+            .getElementsByTagName("fb_memory_usage")[0]
+            .getElementsByTagName("used")[0]
+            .childNodes[0].data.split()[1])
+    if unit != 'MiB':
+       raise AssertionError('Value of fb_memory_usage_used: ' + unit)
+    unit = (gpu
+            .getElementsByTagName("fb_memory_usage")[0]
+            .getElementsByTagName("total")[0]
+            .childNodes[0].data.split()[1])
+    if unit != 'MiB':
+       raise AssertionError('Value of fb_memory_usage_total: ' + unit)
+
+    try:
+        gpu_utilization = int(gpu
+                              .getElementsByTagName("utilization")[0]
+                              .getElementsByTagName("gpu_util")[0]
+                              .childNodes[0]
+                              .data.split()[0])
+    except ValueError:
+        gpu_utilization = None
+
+
+    try:
+        gpu_mem_util = int(gpu
+                            .getElementsByTagName("utilization")[0]
+                            .getElementsByTagName("memory_util")[0]
+                            .childNodes[0]
+                            .data.split()[0])
+    except ValueError:
+        gpu_mem_util = None
+
+
+    try:
+        gpu_fb_memory_usage_used = int(gpu
+                            .getElementsByTagName("fb_memory_usage")[0]
+                            .getElementsByTagName("used")[0]
+                            .childNodes[0]
+                            .data.split()[0]) * 1024*1024
+    except ValueError:
+        gpu_fb_memory_usage_used = None
+
+    try:
+        gpu_fb_memory_usage_total = int(gpu
+                            .getElementsByTagName("fb_memory_usage")[0]
+                            .getElementsByTagName("total")[0]
+                            .childNodes[0]
+                            .data.split()[0]) * 1024*1024
+    except ValueError:
+        gpu_fb_memory_usage_total = None
+
 
     try:
         gpu_temperature = int(gpu
@@ -28,31 +70,54 @@ for gpu in nvidiaSMI.getElementsByTagName('gpu'):
                               .childNodes[0]
                               .data.split()[0])
     except ValueError:
-        gpu_temperature: int = 0
+        gpu_temperature = None
 
-    gpu_sm_clock = int(gpu
-                       .getElementsByTagName("clocks")[0]
-                       .getElementsByTagName("sm_clock")[0]
-                       .childNodes[0]
-                       .data.split()[0])
 
-    gpu_graphics_clock = int(gpu
-                             .getElementsByTagName("clocks")[0]
-                             .getElementsByTagName("graphics_clock")[0]
-                             .childNodes[0]
-                             .data.split()[0])
+    try:
+        gpu_sm_clock = int(gpu
+                           .getElementsByTagName("clocks")[0]
+                           .getElementsByTagName("sm_clock")[0]
+                           .childNodes[0]
+                           .data.split()[0])
+    except ValueError:
+        gpu_sm_clock = None
 
-    gpu_mem_clock = int(gpu
-                        .getElementsByTagName("clocks")[0]
-                        .getElementsByTagName("mem_clock")[0]
-                        .childNodes[0]
-                        .data.split()[0])
 
-    print(f"smi nvidia gpu_utilization {gpu_utilization}")
-    print(f"smi nvidia memory_used {gpu_mem_usage}")
-    print(f"smi nvidia temperature {gpu_temperature}")
-    print(f"smi nvidia graphics_clock {gpu_graphics_clock}")
-    print(f"smi nvidia sm_clock {gpu_sm_clock}")
-    print(f"smi nvidia msm_clock {gpu_mem_clock}")
+    try:
+        gpu_graphics_clock = int(gpu
+                                 .getElementsByTagName("clocks")[0]
+                                 .getElementsByTagName("graphics_clock")[0]
+                                 .childNodes[0]
+                                 .data.split()[0])
+    except ValueError:
+        gpu_graphics_clock: int = 0
+
+
+    try:
+        gpu_mem_clock = int(gpu
+                            .getElementsByTagName("clocks")[0]
+                            .getElementsByTagName("mem_clock")[0]
+                            .childNodes[0]
+                            .data.split()[0])
+    except ValueError:
+        gpu_mem_clock = None
+
+
+    if gpu_utilization is not None or \
+        gpu_fb_memory_usage_total is not None or \
+        gpu_fb_memory_usage_used is not None or \
+        gpu_mem_util is not None or \
+        gpu_temperature is not None or \
+        gpu_graphics_clock is not None or \
+        gpu_sm_clock is not None or \
+        gpu_mem_clock is not None:
+        print(f"smi nvidia gpu_utilization {gpu_utilization}")
+        print(f"smi nvidia memory_util {gpu_mem_util}")
+        print(f"smi nvidia gpu_fb_memory_usage_total {gpu_fb_memory_usage_total}")
+        print(f"smi nvidia gpu_fb_memory_usage_used {gpu_fb_memory_usage_used}")
+        print(f"smi nvidia temperature {gpu_temperature}")
+        print(f"smi nvidia graphics_clock {gpu_graphics_clock}")
+        print(f"smi nvidia sm_clock {gpu_sm_clock}")
+        print(f"smi nvidia msm_clock {gpu_mem_clock}")
 
     i += 1

@@ -46,28 +46,41 @@ graph_info.append({
 })
 
 metric_info["temperature"] = {
-    "title" : _("Temperature"),
+    "title" : _("Temperature(C)"),
     "unit"  : "",
     "color" : "41/b",
 }
 
 graph_info.append({
-    "title"   : _("Temperature"),
+    "title"   : _("Temperature(C)"),
     "metrics" : [
         ( "temperature", "line" ),
     ],
 })
 
-metric_info["memory_used"] = {
-    "title" : _("Memory used"),
+metric_info["memory_util"] = {
+    "title" : _("Memory utilization"),
     "unit"  : "%",
+    "color" : "21/b",
+}
+
+graph_info.append({
+    "title"   : _("Memory utilization"),
+    "metrics" : [
+        ( "memory_util", "line" ),
+    ],
+})
+
+metric_info["gpu_fb_memory_usage_used"] = {
+    "title" : _("Memory used"),
+    "unit"  : "bytes",
     "color" : "21/b",
 }
 
 graph_info.append({
     "title"   : _("Memory used"),
     "metrics" : [
-        ( "memory_used", "line" ),
+        ( "gpu_fb_memory_usage_used", "line" ),
     ],
 })
 
