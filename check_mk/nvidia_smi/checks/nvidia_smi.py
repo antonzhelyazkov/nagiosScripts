@@ -31,6 +31,8 @@ def nvidia_smi_parse(info):
         if len(line) != 4:
             continue # Skip unexpected lines
         pool_name, pm_type, metric, value = line
+        if value == 'None':
+            continue
         item = '%s [%s]' % (pool_name, pm_type)
         if item not in data:
             data[item] = {}
@@ -58,33 +60,59 @@ def check_nvidia_smi(item, params, info):
     data = all_data[item]
 
     perfkeys = [
-        'gpu_utilization', 'memory_used', 'temperature',
+        'gpu_utilization', 'memory_util', 'temperature',
         'graphics_clock', 'msm_clock', 'sm_clock',
+        'gpu_fb_memory_usage_used'
     ]
     # Add some more values, derived from the raw ones...
     this_time = int(time.time())
+    # for key in ['accepted_conn', 'max_children_reached', 'slow_requests']:
+    #    per_sec = get_rate("nginx_status.%s" % key, this_time, data[key])
+    #    data['%s_per_sec' % key] = per_sec
+    #    perfkeys.append('%s_per_sec' % key)
 
     perfdata = []
     for i, key in enumerate(perfkeys):
-        perfdata.append( (key, data[key]) )
+        try:
+            reading = data[key]
+            perfdata.append( (key, data[key]) )
+        except KeyError:
+            pass
     perfdata.sort()
 
     worst_state = 0
 
-    proc_warn, proc_crit = params.get('gpu_utilization', (None, None))
-    proc_txt = ''
-    if proc_crit is not None and data['gpu_utilization'] > proc_crit:
-        worst_state = max(worst_state, 2)
-        proc_txt = ' (!!)'
-    elif proc_warn is not None and data['gpu_utilization'] > proc_warn:
-        worst_state = max(worst_state, 1)
-        proc_txt = ' (!)'
+    try:
+        proc_warn, proc_crit = params.get('gpu_utilization', (None, None))
+        proc_txt = ''
+        if proc_crit is not None and data['gpu_utilization'] > proc_crit:
+            worst_state = max(worst_state, 2)
+            proc_txt = ' (!!)'
+        elif proc_warn is not None and data['gpu_utilization'] > proc_warn:
+            worst_state = max(worst_state, 1)
+            proc_txt = ' (!)'
+    except KeyError:
+        worst_state = 0
+        proc_txt = ''
 
-    output = [
-        'GPU util: %d%s memory used: %d, Temperature %d' % (
-            data['gpu_utilization'], proc_txt, data['memory_used'], data['temperature'],
-        ),
-    ]
+    # output = [
+    #    'Active: %d%s (%d idle, %d waiting)' % (
+    #        data['gpu_utilization'], proc_txt, data['gpu_fb_memory_usage_used'], data['temperature'],
+    #    ),
+    #    'Started %s ago' % (get_age_human_readable(data['graphics_clock'])),
+    #    'Requests: %0.2f/s' % (data['msm_clock']),
+    # ]
+
+    if 'gpu_utilization' in data and 'gpu_fb_memory_usage_used' in data and 'temperature' in data:
+        mem_used_MiB = data['gpu_fb_memory_usage_used'] / (1024*1024)
+        mem_total_MiB = data['gpu_fb_memory_usage_total'] / (1024*1024)
+        output = [
+            'GPU util: %d%%%s, memory used: %d MiB of %d MiB, temperature %dC' % (
+                data['gpu_utilization'], proc_txt, mem_used_MiB, mem_total_MiB, data['temperature'],
+            ),
+        ]
+    else:
+        output = [ 'Too few data from nvidia-smi, assuming GPU is OK', ]
 
     return worst_state, ', '.join(output), perfdata
 
