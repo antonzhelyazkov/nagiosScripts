@@ -30,12 +30,15 @@ tmpXml=$tmpDirTrimmed/$tmpXmlFileName
 
 temperatureWarningTreshold=85
 temperatureCriticalTreshold=95
+fanWarningTreshold=75
+fanCriticalTreshold=85
 
 encoderWarning=0
 decoderWarning=0
 gpuWarning=0
 memoryWarning=0
 temperatureWarning=0
+fanWarning=0
 
 hash xmlstarlet 2>/dev/null
 checkXmlstarlet=$?
@@ -58,6 +61,7 @@ if [ $checkXmlCreation -ne 0 ]; then
         exit 2
 fi
 
+fanUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/fan_speed | sed 's/\ \%*$//')
 encoderUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/utilization/encoder_util | sed 's/\ \%*$//')
 gpuUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/utilization/gpu_util | sed 's/\ \%*$//')
 memoryUtil=$(xmlstarlet fo --dropdtd $tmpXml | xmlstarlet sel -t -v nvidia_smi_log/gpu/utilization/memory_util | sed 's/\ \%*$//')
@@ -71,8 +75,8 @@ rm -f $tmpXml
 
 #echo $temperatureTresholdPercent $temperatureWarningTreshold
 
-if [ $encoderUtil -lt $warning ] && [ $gpuUtil -lt $warning ] && [ $memoryUtil -lt $warning ] && [ $decoderUtil -lt $warning ] && [ $temperatureTresholdPercent -lt $temperatureWarningTreshold ]; then
-        echo "OK GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature"
+if [ $fanUtil -lt $fanWarningTreshold ] && [ $encoderUtil -lt $warning ] && [ $gpuUtil -lt $warning ] && [ $memoryUtil -lt $warning ] && [ $decoderUtil -lt $warning ] && [ $temperatureTresholdPercent -lt $temperatureWarningTreshold ]; then
+        echo "OK GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature; Fan - $fanUtil% | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature fan=$fanUtil%"
         exit 0
 fi
 
@@ -96,14 +100,19 @@ if [ $temperatureTresholdPercent -gt $temperatureWarningTreshold ] && [ $tempera
         temperatureWarning=1
 fi
 
+if [ $fanUtil -gt $fanWarningTreshold ] && [ $fanUtil -lt $fanCriticalTreshold ]; then
+        fanWarning=1
+fi
+
+
 #echo "enc" $encoderWarning "dec" $decoderWarning "gpu" $gpuWarning "mem" $memoryWarning "temp" $temperatureWarning
 
-if [ $encoderWarning -eq 1 ] || [ $decoderWarning -eq 1 ] || [ $gpuWarning -eq 1 ] || [ $memoryWarning -eq 1 ] || [ $temperatureWarning -eq 1 ]; then
-        echo "WARNING GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature"
+if [ $fanWarning -eq 1 ] || [ $encoderWarning -eq 1 ] || [ $decoderWarning -eq 1 ] || [ $gpuWarning -eq 1 ] || [ $memoryWarning -eq 1 ] || [ $temperatureWarning -eq 1 ]; then
+        echo "WARNING GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature; Fan - $fanUtil% | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature fan=$fanUtil%"
         exit 1
 fi
 
-if [ $encoderUtil -gt $critical ] || [ $gpuUtil -gt $critical ] || [ $memoryUtil -gt $critical ] || [ $decoderUtil -gt $critical ] || [ $temperatureTresholdPercent -gt $temperatureCriticalTreshold ]; then
-        echo "CRITICAL GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature"
+if [ $fanUtil -gt $fanCriticalTreshold ] || [ $encoderUtil -gt $critical ] || [ $gpuUtil -gt $critical ] || [ $memoryUtil -gt $critical ] || [ $decoderUtil -gt $critical ] || [ $temperatureTresholdPercent -gt $temperatureCriticalTreshold ]; then
+        echo "CRITICAL GPU - $gpuUtil%; Memory - $memoryUtil%; Encoder - $encoderUtil%; Decoder - $decoderUtil%; Temperature - $temperature; Fan - $fanUtil% | gpu=$gpuUtil% memory=$memoryUtil% encoder=$encoderUtil% decoder=$decoderUtil% temperature=$temperature fan=$fanUtil%"
         exit 2
 fi
