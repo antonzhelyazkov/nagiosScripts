@@ -46,3 +46,11 @@ log file must looks like
 ```
 12.34.56.78 – MISS [11/Nov/2017:09:38:32 +0100] – "GET /qws/qwel/qwe.html HTTP/1.1" 200 1036448 "http://www.example.com/content" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0" "-" – "-" – "-" – "-" – "-"
 ```
+
+
+# check_log
+count error codes 500 in nginx log file
+
+```
+python3 /opt/nagiosScripts/check_log/check_log.py -l /path/to/log/access.log -w 1000 -c 2000 -s 200
+```
