@@ -2,7 +2,7 @@ import datetime
 import argparse
 import os
 import re
-
+import time
 
 TMP_BASE = '/tmp'
 
@@ -51,8 +51,19 @@ class CheckPhpLog:
         if len_arr < chunk_size:
             chunk_size = len_arr - 1
 
-        if last_exec is None:
+        first_date_object = regex_string.search(log_array[0])
+        if first_date_object is None:
+            print("UNKNOWN first date")
+            exit(1)
+        else:
+            row_first_date = first_date_object.group(1)
+    
+        # print(row_first_date)
+        first_timestamp = int(datetime.datetime.strptime(row_first_date, "%d/%b/%Y:%H:%M:%S").timestamp())  
+
+        if last_exec is None or first_timestamp >= int(last_exec):
             row_position = 0
+            # print("ROW position 0")
         else:
             chunk_size_base = chunk_size
             while i:
@@ -77,8 +88,6 @@ class CheckPhpLog:
                 if chunk_size > len_arr:
                     i = False
                     row_position = item_l
-
-        # print(row_position, len_arr)
 
         count_500 = 0
         count_404 = 0
@@ -131,4 +140,3 @@ class CheckPhpLog:
 
 if __name__ == '__main__':
     encoder = CheckPhpLog()
-
